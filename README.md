@@ -24,17 +24,7 @@ vi .env
 Build the required Docker images for each environment. Note that the MySQL build requires local user IDs for volume permission consistency.
 
 ```bash
-# Perl environment
-docker compose build perl
-
-# Python environment
-docker compose build python
-
-# ROBOT (Ontology processing)
-docker compose build robot
-
-# MySQL (Database)
-docker compose build mysql
+docker compose build virtuoso
 ```
 
 ### 3. Execution and Operation  
