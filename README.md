@@ -27,11 +27,20 @@ Build the required Docker images for each environment. Note that the MySQL build
 docker compose build virtuoso
 ```
 
-### 3. Execution and Operation  
-Operational workflows are detailed in the following documentation:  
+### 3. Execution
 
-* [MySQL Update Procedure](https://docs.google.com/spreadsheets/d/12JjDHkd4k9oI5Xme_Isyg9nqUsHU1PZvmvz5DQPKNZc/edit?gid=1150718828#gid=1150718828)
-* [NANDO Ontology Update Procedure](https://docs.google.com/spreadsheets/d/12JjDHkd4k9oI5Xme_Isyg9nqUsHU1PZvmvz5DQPKNZc/edit?gid=1914005581#gid=1914005581)  
+Start the container with the following command:  
+
+```bash
+docker compose up -d
+```
+
+---
+
+## Operations
+
+The procedure for updating Virtuoso data is as follows:  
+* https://docs.google.com/spreadsheets/d/12JjDHkd4k9oI5Xme_Isyg9nqUsHU1PZvmvz5DQPKNZc/edit?gid=1150718828#gid=1150718828  
 
 [!IMPORTANT]  
 If you are unable to access the documentation links above, please contact the DBCLS team.  
