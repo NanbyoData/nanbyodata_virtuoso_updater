@@ -1,0 +1,24 @@
+services:
+  # Virtuoso
+  virtuoso-update:
+    container_name: nanbyodata-virtuoso-update
+    image: openlink/virtuoso-opensource-7:7.2.12
+    environment:
+      VIRT_Parameters_DirsAllowed: /rdf_data
+      VIRT_Parameters_NumberOfBuffers: 340000
+      VIRT_Parameters_MaxDirtyBuffers: 250000
+      VIRT_Client_SQL_PREFETCH_ROWS: 10000
+      VIRT_Client_SQL_PREFETCH_BYTES: 1600000
+      VIRT_SPARQL_ResultSetMaxRows: 100000000
+      VIRT_SPARQL_MaxQueryCostEstimationTime: 0
+      VIRT_SPARQL_MaxQueryExecutionTime: 8000
+      VIRT_SPARQL_MaxSortedTopRows: 200000
+      DBA_PASSWORD: ${DBA_PASSWORD}
+      TZ: Asia/Tokyo
+    user: "${UID:-0}:${DOCKER_GID:-0}"
+    volumes:
+      - ${RDF_DIR:-./../data/nanbyodata}:/rdf_data
+      - ${SCRIPTS_DIR:-./../scripts/}:/scripts
+      - ${PWD}/database:/opt/virtuoso-opensource/database
+    ports:
+      - "${ENDPOINT_PORT:-8890}:8890"
