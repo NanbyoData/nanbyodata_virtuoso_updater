@@ -70,7 +70,8 @@ for data in "${targets[@]}"; do
         continue
     fi
     ln -sfn "$today" "$latest" || exit 1
-    if [[ -n $previous_dir ]]; then
+    # 手動配置のデータだけを、更新日時などの属性を保持してコピーする。
+    if [[ ${data_methods[$data]} == manual && -n $previous_dir ]]; then
         if ! cp -a -- "${previous_dir}/." "${latest}/"; then
             echo "過去データのコピーに失敗しました: $previous_dir -> $latest" >&2
             exit 1
