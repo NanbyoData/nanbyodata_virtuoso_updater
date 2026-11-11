@@ -13,47 +13,57 @@
 
 ### 1. Environment Configuration
 
-Initialize your environment variables by copying the template file and editing it with your local settings.
+Create `.env` from `template.env` using your editor and fill in your local settings.
+To use this repository's scripts and sample data, set these paths in `.env`:
 
-```bash
-cp template.env .env
-vi .env
+```dotenv
+RDF_DIR=./data/nanbyodata
+SCRIPTS_DIR=./scripts
 ```
 
-### 2. Building Containers  
-Build the required Docker images for each environment. Note that the MySQL build requires local user IDs for volume permission consistency.
+The Compose service mounts the data directory at `/rdf_data`, scripts at `/scripts`,
+and this repository's `config` directory read-only at `/config`.
+Edit `config/data_sources.csv` with your editor before running data operations.
 
-```bash
-docker compose build virtuoso
-```
-
-### 3. Execution
+### 2. Execution
 
 Start the container with the following command:  
 
 ```bash
-docker compose up -d
+docker compose up -d virtuoso-update
 ```
 
 ---
 
 ## Operations
 
-Pass the data root directory (the parent of `ontology`) with `-o`.
-Edit `config/data_sources.csv`, prepare directories, then install data into `latest`:
+Run all scripts inside the `virtuoso-update` container via Docker Compose.
+The examples below are issued from the repository directory on the host; the script
+paths and arguments refer to paths inside the container. Pass the data root directory
+(the parent of `ontologies`) with `-o`.
+Run the following four steps in order:
 
 ```bash
-vi config/data_sources.csv
-bash scripts/create_data_dirs.sh -o /path/to/nanbyodata -c config/data_sources.csv -a
-bash scripts/get_data.sh -o /path/to/nanbyodata -c config/data_sources.csv -a
-# Select individual datasets, or use another config file:
-bash scripts/get_data.sh -o /path/to/nanbyodata -c config/data_sources.csv hp mondo medgen mp
-bash scripts/create_data_dirs.sh -o /path/to/nanbyodata -c /path/to/data_sources.csv -a
-bash scripts/get_data.sh -o /path/to/nanbyodata -c /path/to/data_sources.csv -a
+# 1. Create dated directories, update latest, and copy previous data.
+docker compose exec virtuoso-update bash /scripts/create_data_dirs.sh -o /rdf_data -c /config/data_sources.csv -a
+
+# 2. Download data into latest.
+docker compose exec virtuoso-update bash /scripts/get_data.sh -o /rdf_data -c /config/data_sources.csv -a
+
+# Before step 3, place or generate any manual data in the indicated latest directories.
+
+# 3. Load prepared data into Virtuoso.
+docker compose exec virtuoso-update bash /scripts/load_data.sh -o /rdf_data -c /config/data_sources.csv -a
+
+# 4. Check the loaded graph counts.
+docker compose exec virtuoso-update bash /scripts/check_virtuoso_data.sh
 ```
 
-Both commands require the config path via `-c`; there is no default path.
-Relative config paths resolve from the working directory. The CSV has only
+The first three commands require `-o` and `-c`; there is no default config path.
+To process selected datasets, replace `-a` with their names (for example, `hp mondo`)
+in each of those three commands. Use the same config and selected datasets throughout.
+To use another config, place it in the host's `config` directory and specify its
+container path under `/config`. The CSV has only
 three columns: data name, acquisition method, and source URL.
 
 ```csv
@@ -73,12 +83,12 @@ filenames are defined in `scripts/data_config.sh`:
 
 | Data | Directory relative to data root | Filename |
 | --- | --- | --- |
-| `hp` | `ontology/hp` | `hp.owl` |
-| `mondo` | `ontology/mondo` | `mondo-international.owl` |
+| `hp` | `ontologies/hp` | `hp.owl` |
+| `mondo` | `ontologies/mondo` | `mondo-international.owl` |
 | `mp` | `mp` | `mp-international.owl` |
 | `medgen` | `medgen_rdf` | Names from the downloaded files |
-| `nando` | `ontology/nando` | `nando.ttl` |
-| `ordo` | `ontology/ordo` | `ordo.owl` |
+| `nando` | `ontologies/nando` | `nando.ttl` |
+| `ordo` | `ontologies/ordo` | `ordo.owl` |
 | `pcf` | `pcf_rdf` | Names from the generation process |
 | `rdf` | `rdf` | Names from the source files |
 
@@ -114,32 +124,30 @@ same day preserves installed data. On the first run, empty directories are creat
 After preparation, the command logs config entries requiring manual placement
 or a download URL. These notices also appear on
 same-day reruns. `get_data.sh` requires prepared `latest` symlinks and does not
-create directories or change symlinks. Use the same config for both commands.
+create directories or change symlinks.
 
-Load prepared data into Virtuoso with the same config:
-
-```bash
-bash scripts/update_ontology_data.sh -o /rdf_data -c /path/to/data_sources.csv -a
-# Load selected datasets:
-bash scripts/update_ontology_data.sh -o /rdf_data -c /path/to/data_sources.csv hp mondo
-```
-
-Run this command in the Virtuoso container, using paths visible inside it.
-Both `-o` and `-c` are required. `-a` loads every dataset registered in the config,
+`load_data.sh -a` loads every dataset registered in the config,
 including `manual` datasets after their files have been placed. The loader reads
 `latest` directories using the shared directory definitions. Graph names and file
-patterns are defined in `update_ontology_data.sh`; `rdf` loads into
+patterns are defined in `load_data.sh`; `rdf` loads into
 `https://nanbyodata.jp/rdf/nanbyodata`. All selected datasets must have matching
 files before any graph is cleared. Load errors stop subsequent processing.
 
-Run the local script tests without network access:
+`check_virtuoso_data.sh` displays the triple count for each graph after loading.
+
+Run the script tests in a disposable Python container. Downloads and SQL execution
+are mocked; the tests use temporary files inside that container. Docker may need
+to download the Python image on the first run.
 
 ```bash
-python3 -m unittest discover -s tests
+docker run --rm \
+  --mount "type=bind,src=$PWD,dst=/workspace,readonly" \
+  --workdir /workspace \
+  python:3.14-bookworm python3 -B -m unittest discover -s tests
 ```
 
 The procedure for updating Virtuoso data is as follows:  
 * https://docs.google.com/spreadsheets/d/12JjDHkd4k9oI5Xme_Isyg9nqUsHU1PZvmvz5DQPKNZc/edit?gid=1150718828#gid=1150718828  
 
 [!IMPORTANT]  
-If you are unable to access the documentation links above, please contact the DBCLS team.  
+If you are unable to access the documentation links above, please contact the DBCLS team.

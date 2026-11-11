@@ -2,8 +2,8 @@
 
 # 保存先とファイル名は固定。configには取得方法と取得元だけを書く。
 declare -A data_directories=(
-    [medgen]=medgen_rdf [mp]=mp [hp]=ontology/hp [mondo]=ontology/mondo
-    [nando]=ontology/nando [ordo]=ontology/ordo [pcf]=pcf_rdf [rdf]=rdf
+    [medgen]=medgen_rdf [mp]=mp [hp]=ontologies/hp [mondo]=ontologies/mondo
+    [nando]=ontologies/nando [ordo]=ontologies/ordo [pcf]=pcf_rdf [rdf]=rdf
 )
 declare -A data_filenames=(
     [medgen]=- [mp]=mp-international.owl [hp]=hp.owl [mondo]=mondo-international.owl

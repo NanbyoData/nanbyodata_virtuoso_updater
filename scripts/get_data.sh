@@ -8,7 +8,7 @@ DATA_ROOT_DIR=''
 all_flag=false
 
 usage() {
-    echo "使用法: $0 -o <データルートディレクトリ（ontologyの親）> -c <configファイル> [-a] [データ名 ...]" >&2
+    echo "使用法: $0 -o <データルートディレクトリ（ontologiesの親）> -c <configファイル> [-a] [データ名 ...]" >&2
     exit 2
 }
 

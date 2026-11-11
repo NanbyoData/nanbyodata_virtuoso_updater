@@ -7,7 +7,7 @@ DATA_ROOT_DIR=''
 all_flag=false
 
 usage() {
-    echo "使用法: $0 -o <データルートディレクトリ（ontologyの親）> -c <configファイル> [-a] [データ名 ...]" >&2
+    echo "使用法: $0 -o <データルートディレクトリ（ontologiesの親）> -c <configファイル> [-a] [データ名 ...]" >&2
 }
 
 while getopts 'o:c:a' opt; do
@@ -25,7 +25,7 @@ if [[ -z $DATA_ROOT_DIR || -z $CONFIG_FILE ]]; then
     exit 2
 fi
 
-# -o にはontologyを含むデータルートを指定する。
+# -o にはontologiesを含むデータルートを指定する。
 DATA_ROOT_DIR=${DATA_ROOT_DIR%/}
 load_data_config "$CONFIG_FILE" || exit 1
 

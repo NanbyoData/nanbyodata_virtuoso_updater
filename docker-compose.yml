@@ -19,6 +19,7 @@ services:
     volumes:
       - ${RDF_DIR:-./../data/nanbyodata}:/rdf_data
       - ${SCRIPTS_DIR:-./../scripts/}:/scripts
+      - ./config:/config:ro
       - ${PWD}/database:/opt/virtuoso-opensource/database
     ports:
       - "${ENDPOINT_PORT:-8890}:8890"
