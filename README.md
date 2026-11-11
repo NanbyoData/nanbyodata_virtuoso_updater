@@ -44,7 +44,7 @@ paths and arguments refer to paths inside the container. Pass the data root dire
 Run the following four steps in order:
 
 ```bash
-# 1. Create dated directories, update latest, and copy previous data.
+# 1. Create dated directories, update latest, and copy only manual data.
 docker compose exec virtuoso-update bash /scripts/create_data_dirs.sh -o /rdf_data -c /config/data_sources.csv -a
 
 # 2. Download data into latest.
@@ -101,8 +101,8 @@ All destinations are under the directory's `latest` symlink.
 | `manual` | Log the placement destination and preserve existing data. |
 
 MedGen uses `downloadAndParase`: it downloads `*.ttl.gz` files and decompresses
-these into `latest`. Download or decompression failures stop installation before
-processing the next dataset.
+these directly into `latest`. Download or decompression failures stop installation
+before processing the next dataset. `manual` datasets are left untouched.
 
 ORDO uses `download`, with the English ORDO 4.9 OWL URL from the
 [official distribution page](https://sciences.orphadata.com/ordo/) specified in the CSV:
@@ -117,8 +117,11 @@ PCF, NANDO, and NanbyoData RDF use `manual`. Place or generate PCF data directly
 in `pcf_rdf/latest`; `get_data.sh` only displays its destination and preserves it.
 The former `-i` and `-p` options are replaced by config settings.
 
-`create_data_dirs.sh` creates `YYYYMMDD` directories, updates each `latest`
-symlink, and copies the previous `latest` data into the new directory. Use data
+`create_data_dirs.sh` creates `YYYYMMDD` directories and updates each `latest`
+symlink. Only `manual` datasets are copied from the previous `latest`, preserving
+file modification times and other attributes with `cp -a`. The destination directory
+name uses today's date. Automatically downloaded datasets start empty so that old
+filenames are not carried over; `get_data.sh` downloads directly into `latest`. Use data
 names instead of `-a` to prepare selected datasets. Repeating preparation on the
 same day preserves installed data. On the first run, empty directories are created.
 After preparation, the command logs config entries requiring manual placement
