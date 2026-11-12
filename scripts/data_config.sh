@@ -16,6 +16,7 @@ load_data_config() {
     [[ -r $config ]] || { echo "configを読み込めません: $config" >&2; return 1; }
     config_dir=$(cd "$(dirname "$config")" && pwd) || return 1
     data_names=()
+    all_data_names=()
     declare -gA data_methods=() data_sources=()
     while IFS= read -r line || [[ -n $line ]]; do
         ((line_number += 1))
@@ -51,6 +52,11 @@ load_data_config() {
         esac
         "$valid" || { echo "取得方法・取得元が不正です: $config:$line_number" >&2; return 1; }
         data_names+=("$name")
+        # 手動管理する3データは、明示的に指定されたときだけ処理する。
+        case "$name" in
+            nando|pcf|rdf) ;;
+            *) all_data_names+=("$name") ;;
+        esac
         data_methods[$name]=$method
         data_sources[$name]=$source
     done < "$config"

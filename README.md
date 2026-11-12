@@ -44,13 +44,11 @@ paths and arguments refer to paths inside the container. Pass the data root dire
 Run the following four steps in order:
 
 ```bash
-# 1. Create dated directories, update latest, and copy only manual data.
+# 1. Create dated directories and update latest for automatic datasets.
 docker compose exec virtuoso-update bash /scripts/create_data_dirs.sh -o /rdf_data -c /config/data_sources.csv -a
 
 # 2. Download data into latest.
 docker compose exec virtuoso-update bash /scripts/get_data.sh -o /rdf_data -c /config/data_sources.csv -a
-
-# Before step 3, place or generate any manual data in the indicated latest directories.
 
 # 3. Load prepared data into Virtuoso.
 docker compose exec virtuoso-update bash /scripts/load_data.sh -o /rdf_data -c /config/data_sources.csv -a
@@ -60,6 +58,8 @@ docker compose exec virtuoso-update bash /scripts/check_virtuoso_data.sh
 ```
 
 The first three commands require `-o` and `-c`; there is no default config path.
+In all three scripts, `-a` excludes `nando`, `pcf`, and `rdf`. These datasets
+are processed only when explicitly selected by name (`pcf` refers to `pcf_rdf`).
 To process selected datasets, replace `-a` with their names (for example, `hp mondo`)
 in each of those three commands. Use the same config and selected datasets throughout.
 To use another config, place it in the host's `config` directory and specify its
@@ -129,8 +129,9 @@ or a download URL. These notices also appear on
 same-day reruns. `get_data.sh` requires prepared `latest` symlinks and does not
 create directories or change symlinks.
 
-`load_data.sh -a` loads every dataset registered in the config,
-including `manual` datasets after their files have been placed. The loader reads
+`load_data.sh -a` loads the datasets registered in the config except `nando`,
+`pcf`, and `rdf`. To load these datasets after preparing their files, specify
+their names explicitly instead of `-a`. The loader reads
 `latest` directories using the shared directory definitions. Graph names and file
 patterns are defined in `load_data.sh`; `rdf` loads into
 `https://nanbyodata.jp/rdf/nanbyodata`. All selected datasets must have matching

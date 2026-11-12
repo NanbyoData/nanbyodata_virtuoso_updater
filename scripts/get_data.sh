@@ -43,7 +43,7 @@ load_data_config "$CONFIG_FILE"
 
 targets=("$@")
 if "$all_flag"; then
-    targets=("${data_names[@]}")
+    targets=("${all_data_names[@]}")
 fi
 (( ${#targets[@]} > 0 )) || usage
 
