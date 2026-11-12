@@ -1,0 +1,9 @@
+name,method,source
+medgen,downloadAndParase,https://rdfportal.org/pub/turtle/medgen/latest/
+mp,download,http://purl.obolibrary.org/obo/mp.owl
+hp,download,http://purl.obolibrary.org/obo/hp.owl
+mondo,download,https://purl.obolibrary.org/obo/mondo/mondo-international.owl
+nando,manual,-
+ordo,download,https://www.orphadata.com/data/ontologies/ordo/last_version/ORDO_en_4.9.owl
+pcf,manual,-
+rdf,manual,-
