@@ -60,6 +60,8 @@ docker compose exec virtuoso-update bash /scripts/check_virtuoso_data.sh
 The first three commands require `-o` and `-c`; there is no default config path.
 In all three scripts, `-a` excludes `nando`, `pcf`, and `rdf`. These datasets
 are processed only when explicitly selected by name (`pcf` refers to `pcf_rdf`).
+Explicit names can also be combined with `-a`: `-a nando pcf rdf` includes
+these three datasets alongside the automatic datasets.
 To process selected datasets, replace `-a` with their names (for example, `hp mondo`)
 in each of those three commands. Use the same config and selected datasets throughout.
 To use another config, place it in the host's `config` directory and specify its

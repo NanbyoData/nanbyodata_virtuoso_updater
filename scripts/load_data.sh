@@ -50,7 +50,7 @@ DATA_ROOT_DIR=${DATA_ROOT_DIR%/}
 load_data_config "$CONFIG_FILE"
 targets=("$@")
 if "$all_flag"; then
-    targets=("${all_data_names[@]}")
+    targets=("${all_data_names[@]}" "$@")
 fi
 (( ${#targets[@]} > 0 )) || usage
 
